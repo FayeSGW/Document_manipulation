@@ -18,19 +18,23 @@ def main():
         elif sys.argv[2].endswith("pdf") == False:
             sys.exit("Output not a valid pdf")
         else:
-            trans = translation()
-            pdf_create(trans)
+            text = extract_text(sys.argv[1]).strip()
+            if len(text) > 5000:
+                sys.exit("Input pdf is too long!")
+            else:
+                trans = translation(text)
+                pdf_create(trans)
     except FileNotFoundError:
         sys.exit("Can't find input file")
 
-def translation():
+def translation(x):
     #RegEx to handle the code left by Translator at the start and end of the text
     prefix = r"^Translated\(src.+text="
     suffix = r"pronunciation.+\"\)$"
 
     #Get text from pdf, translate to English
-    text = extract_text(sys.argv[1]).strip()
-    translated = str(translator.translate(text))
+
+    translated = str(translator.translate(x))
 
     #Remove code left by Translator at the start and end of the text
     prefix_removed = re.sub(prefix, "", translated)
