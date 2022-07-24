@@ -7,6 +7,8 @@ import sys
 translator = Translator()
 pdf = FPDF()
 
+splits = []
+
 def main():
     try:
         if len(sys.argv) < 3:
@@ -20,20 +22,31 @@ def main():
         else:
             text = extract_text(sys.argv[1]).strip()
             if len(text) > 5000:
-                sys.exit("Input pdf is too long!")
+                new = splittext(text)
+                pdf_create(new)
             else:
                 trans = translation(text)
                 pdf_create(trans)
     except FileNotFoundError:
         sys.exit("Can't find input file")
 
+def splittext(t):
+    s = int((len(t)/5000)+1) #Split full text into sections of 5000 chars
+    for i in range(s):
+        split = t[(i*5000):(((i+1)*5000)-1)]
+        transplit = translation(split) #Translate each section separately
+        splits.append(transplit)
+        new = " ".join(splits) #Join sections of translated text together
+    return new
+
+
 def translation(x):
     #RegEx to handle the code left by Translator at the start and end of the text
     prefix = r"^Translated\(src.+text="
     suffix = r"pronunciation.+\"\)$"
 
-    #Get text from pdf, translate to English
 
+    #Translate to English
     translated = str(translator.translate(x))
 
     #Remove code left by Translator at the start and end of the text
