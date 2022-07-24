@@ -22,6 +22,7 @@ def main():
         else:
             text = extract_text(sys.argv[1]).strip()
             if len(text) > 5000:
+                print("Text is long, please be patient and wait for translation!")
                 new = splittext(text)
                 pdf_create(new)
             else:
