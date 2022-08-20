@@ -1,10 +1,7 @@
 from pdfminer.high_level import extract_text
 import tkinter as tk
 from tkinter import EXTENDED, ttk, filedialog
-import re
-import os
-import sys
-import docx
+import re, os, sys, docx, winshell
 
 class Search(tk.Tk):
     def __init__(self):
@@ -46,10 +43,10 @@ class Search(tk.Tk):
         folder = os.listdir(self.open_folder)
         for filename in folder:
             file = self.open_folder + "\\" + filename
-            if file.endswith(".pdf"):
+            if filename.endswith(".pdf"):
                 f = extract_text(file)
                 self.keyword(filename, f)
-            elif file.endswith(".doc") or file.endswith(".docx"):
+            elif filename.endswith(".doc") or file.endswith(".docx"):
                 doc = docx.Document(file)
                 texts = []
                 for para in doc.paragraphs:
@@ -68,68 +65,44 @@ class Search(tk.Tk):
 
     def newwindow(self):
         wind = tk.Toplevel(self)
+        wind.geometry("300x200")
         self.title("Files Containing Keyword")
-        self.boxframe = ttk.Frame(wind, padding = "10", width = 200)
+        self.boxframe = ttk.Frame(wind, padding = "10")
         self.boxframe.grid(column = 0, row = 0)
+        self.buttonsframe = ttk.Frame(wind, padding = "10")
+        self.buttonsframe.grid(column = 1, row = 0)
 
         filelist = tk.StringVar(value = self.lst)
         self.box = tk.Listbox(self.boxframe, listvariable = filelist, selectmode = EXTENDED)
         self.box.grid(column = 0, row = 0)
-        openbtn = ttk.Button(self.boxframe, text = "Open Files", command = self.openfiles)
-        openbtn.grid(column = 0, row = 1)
+        openbtn = ttk.Button(self.buttonsframe, text = "Open Files", command = self.openfiles)
+        openbtn.grid(column = 0, row = 0)
+        savebtn = ttk.Button(self.buttonsframe, text = "Save", command = self.savefiles)
+        savebtn.grid(column = 0, row = 1)
 
     def openfiles(self):
         files = self.box.curselection()
         for i in files:
-            f = self.box.get(i)
+            f = os.path.join(self.open_folder, self.box.get(i))
             os.startfile(f)
 
+    def savefiles(self):
+        source = os.path.join(self.open_folder, self.kword.get())
+        try:
+            os.mkdir(source)
+        except FileExistsError:
+            pass
 
-
-def main(): 
-
-    f_input = input("Folder to search: ").replace("/", "\\")
-    folder = os.listdir(f_input)
-
-    global text
-    text = input("What keyword do you want to find? ")
-    global lst
-    lst = []
-
-    if len(lst) == 0:
-        print("Keyword not found anywhere!")
-    else:
-        print(lst)
-
-    for filename in folder:
-        if f_input.endswith("\\"):
-            file = f_input + filename
-        else:
-            file = f_input + "\\" + filename
-        if file.endswith(".pdf"):
-            f = extract_text(file)
-            keyword(filename, f)
-        elif file.endswith(".doc") or file.endswith(".docx"):
-            doc = docx.Document(file)
-            texts = []
-            for para in doc.paragraphs:
-                texts.append(para.text)
-            fulltext = " ".join(texts)
-            keyword(filename, fulltext)
-
-    choice = input("Open files? ").lower().strip()
-    if choice == "yes" or choice == "y":
-        for i in lst:
-            os.startfile(i)
-    else:
-        sys.exit()
-
-def keyword(filename, txt):
-    search = re.search(text, txt, re.IGNORECASE)
-    if search:
-        lst.append(filename)
-    else:
-        return "no"
+        files = self.box.curselection()
+        for i in files:
+            target = os.path.join(self.open_folder, self.box.get(i))
+            shortcutname = self.box.get(i)[0:-5] + ".lnk"
+            newpath = os.path.join(source, shortcutname)
+            shortcut = winshell.shortcut(target)
+            shortcut.working_directory = source
+            shortcut.write(newpath)
+            shortcut.dump()
+            
 
 if __name__ == "__main__":
     app = Search()
