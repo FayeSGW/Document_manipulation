@@ -18,7 +18,7 @@ class Search(tk.Tk):
         self.submit = ttk.Frame(self)
         self.submit.grid(column = 0, row = 3)
 
-        #Intro and explanation
+        #Intro and explanation text
         introtext = ttk.Label(self.intro, text = "Use this programme to search for a keyword (or key phrase) in pdf and Word files.")
         introtext.config(wraplength= 400)
         introtext.grid(column = 0, row = 0)
@@ -39,7 +39,7 @@ class Search(tk.Tk):
         self.keyword_entry = ttk.Entry(self.keywordsearch, textvariable = self.kword)
         self.keyword_entry.grid(column = 0, row = 1)
 
-        #Submit
+        #Submit button
         self.submitbtn = ttk.Button(self.submit, text = "Search", command = self.search)
         self.submitbtn.grid(column = 0, row = 0)
 
@@ -75,8 +75,8 @@ class Search(tk.Tk):
                 
                 self.newwindow()
             except AttributeError:
-                #Prompts user to choose a folder is they haven't
-                self.error("folder")
+                #Prompts user to choose a folder if they haven't
+                self.error("valid folder")
 
     def error(self, label):
         #Message to prompt user to input folder or keyword if they haven't
@@ -106,10 +106,11 @@ class Search(tk.Tk):
         boxlbl = ttk.Label(self.boxframe, text = "Files containing keyword:")
         boxlbl.grid(column = 0, row = 0)
         filelist = tk.StringVar(value = self.lst)
-        self.box = tk.Listbox(self.boxframe, listvariable = filelist, selectmode = EXTENDED, width = 50)
+        self.box = tk.Listbox(self.boxframe, listvariable = filelist, selectmode = EXTENDED, width = 40)
         self.box.grid(column = 0, row = 1)
 
-        buttonstext = ttk.Label(self.buttonsframe, text = "Select files you are interested in. \n These can be opened externally using the button below. \n You can also save shortcuts to the selected files in a new subfolder, for easy perusal at a later time.")
+        buttonstext = ttk.Label(self.buttonsframe, text = "Select files you are interested in to left. \n\nFiles can be opened externally using the button below. \n\nUse the Save button to create shortcuts to the selected files in a new subfolder, for easy perusal at a later time.")
+        buttonstext.config(wraplength = "250")
         buttonstext.grid(column = 0, row = 0)
         openbtn = ttk.Button(self.buttonsframe, text = "Open Files", command = self.openfiles)
         openbtn.grid(column = 0, row = 1)
