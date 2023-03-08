@@ -58,9 +58,10 @@ def translation(x):
 def pdf_create(newtext):
     #Create pdf in English
     pdf.add_page()
-    pdf.set_font("Times", size = 10)
+    pdf.add_font(fname = "C:\Windows\Fonts\Calibri.ttf")
+    pdf.set_font("Calibri", size = 10)
     pdf.multi_cell(180, 5, txt = newtext)
     pdf.output(sys.argv[2])
-
+py
 if __name__ == "__main__":
     main()
