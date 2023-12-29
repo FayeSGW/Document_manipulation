@@ -1,7 +1,7 @@
-from pdfminer.high_level import extract_text
 import tkinter as tk
 from tkinter import EXTENDED, ttk, filedialog
 import re, os, docx, winshell
+import fitz
 
 class Search(tk.Tk):
     def __init__(self):
@@ -60,15 +60,21 @@ class Search(tk.Tk):
                 for filename in folder:
                     file = self.open_folder + "\\" + filename
                     if filename.endswith(".pdf"):
-                        f = extract_text(file)
-                        self.keyword(filename, f)
-                    elif filename.endswith(".doc") or file.endswith(".docx"):
+                        doc = fitz.open(file)
+                        texts = []
+                        for page in doc:
+                            texts.append(page.get_text())
+                        fulltext = " ".join(texts)
+                        self.keyword(filename, fulltext)
+                        print(filename)
+                    elif filename.endswith(".doc") or filename.endswith(".docx") and not filename.startswith("~$"):
                         doc = docx.Document(file)
                         texts = []
                         for para in doc.paragraphs:
                             texts.append(para.text)
                         fulltext = " ".join(texts)
                         self.keyword(filename, fulltext)
+                        print(filename)
                 #If keyword not found in any files
                 if len(self.lst) == 0:
                     self.lst.append("No files found!")
